@@ -1,27 +1,26 @@
 --$Name:17 комнат$
 require "parser/mp-ru"
 require "fmt"
-require "autotheme"
 -- mp.errhints = false
 game.dsc = false
 
-include "room1"
-include "room2"
-include "room3"
-include "room4"
-include "room5"
-include "room6"
-include "room7"
-include "room8"
-include "room9"
-include "room10"
-include "room11"
-include "room12"
-include "room13"
-include "room14"
-include "room15"
-include "room16"
-include "room17"
+function file_exists(name)
+   local f=io.open(name,"r")
+   if f~=nil then io.close(f) return true else return false end
+end
+
+if file_exists('autotheme.lua') then
+  require "autotheme"
+end
+
+local i = 1
+while (i <= 17) do
+  local f = 'room'..i
+  if file_exists(f..'.lua') then
+    include(f)
+  end
+  i = i + 1
+end
 
 mp.undo = 20
 mp.score = 0 -- enable scoring
