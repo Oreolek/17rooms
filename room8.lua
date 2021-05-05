@@ -1028,3 +1028,9 @@ clothing {
   mode = 'cold';
   description = 'Серая спортивная толстовка с длинными рукавами.';
 }
+
+std.for_each_obj(function(v)
+  if (v.check_inventory ~= nil and v.getlevel ~= nil) then
+    list_clothing:add(v)
+  end
+end)
