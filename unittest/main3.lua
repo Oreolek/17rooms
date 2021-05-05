@@ -45,7 +45,7 @@ rundebug = function(s)
   all_levels['nil'] = {};
 
   -- проверяем пары
-  std.for_each_obj(function(v)
+  list_clothing:for_each(function(v)
     if v.paired_hot ~= nil or v.paired_cold ~= nil or v.paired_neutral ~= nil then
       expect.exist(v.mode)
       expect.attr(v, 'clothing')

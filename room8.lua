@@ -1,6 +1,10 @@
 require "snapshots"
 mp.auto_animate = false
 
+global {
+  list_clothing = std.list {};
+}
+
 obj {
   -"зубчатый ключ,ключ";
   nam = "thooskey";
@@ -52,7 +56,7 @@ Verb {
 function room8_switch_temperature(temp, forced)
   local oldtemp = _('room8_garderob')._mode
   -- TODO: очень тяжёлый цикл, надо как-то оптимизировать
-  std.for_each_obj(function(v)
+  list_clothing:for_each(function(v)
     if (forced and v:where() ~= nil and v:where().nam == 'room8_control') then
       return
     end
@@ -715,6 +719,7 @@ clothing {
   part = 'top';
   paired_cold = 'room8_wintercoat';
   paired_hot = 'room8_overcoat';
+  found_in = 'room8_clothes';
   level = 4;
   weight = 2;
   mode = 'neutral';
@@ -734,13 +739,24 @@ clothing {
 }
 
 clothing {
+  -"тёплая рубашка/жр";
+  nam = 'room8_warmshirt';
+  part = 'top';
+  level = 2;
+  mode = 'cold';
+  paired_hot = 'room8_lightwear';
+  paired_neutral = 'room8_shirt';
+  description = 'Утеплённая салатовая рубашка с длинными рукавами.';
+}
+
+clothing {
   -"рубашка/жр";
   nam = 'room8_shirt';
   part = 'top';
   level = 2;
   found_in = 'room8_clothes';
   paired_hot = 'room8_lightwear';
-  paired_cold = 'room8_wintercoat';
+  paired_cold = 'room8_warmshirt';
   mode = 'neutral';
   description = 'Женская салатовая рубашка с длинными рукавами.';
 }
@@ -751,7 +767,7 @@ clothing {
   part = 'top';
   level = 2;
   mode = 'hot';
-  paired_cold = 'room8_wintercoat';
+  paired_cold = 'room8_warmshirt';
   paired_neutral = 'room8_shirt';
   description = "Чёрная рубашка с длинными рукавами с большими дырами для вентиляции. Очень большими дырами.";
 }
