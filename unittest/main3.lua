@@ -27,8 +27,8 @@ function expect.attr(value, attribute)
 end
 
 pl.test = function()
-  rununittest(pl);
   rundebug(pl);
+  rununittest(pl);
 end;
 
 rundebug = function(s)
@@ -114,11 +114,9 @@ rununittest = function(s)
     end)
 
     describe('room8 - одежда', function()
-      lester.before(function()
-        pl.move('room8_garderob');
-      end);
-
       it('превращение', function()
+        walk('room8_garderob');
+        expect.equal(here().nam, 'room8_garderob')
         expect.attr(_('room8_clothes'), '~open')
         parse('открыть шкаф');
         expect.attr(_('room8_clothes'), 'open')
@@ -163,7 +161,7 @@ rununittest = function(s)
         parse('снять мини-блузку')
         expect.attr(_('room8_formalcoat'), '~worn')
         expect.attr(_('room8_blouse'), '~worn')
-        parse('надеть авоську')
+        parse('надеть лёгкую рубашку')
         expect.not_exist(me():srch('room8_shirt'))
         expect.not_exist(me():srch('room8_wintercoat'))
         expect.exist(me():srch('room8_lightwear'))
@@ -197,6 +195,7 @@ rununittest = function(s)
       end);
 
       it('room8 - прохождение', function()
+        walk('room8_garderob');
         room8_switch_temperature('cold');
         take('room8_wintercoat')
         parse('положить шубу на рычаг');

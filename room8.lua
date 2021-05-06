@@ -603,7 +603,7 @@ clothing {
 }
 
 clothing {
-  -"твидовый пиджак,пиджак/мр";
+  -"твидовый пиджак,пиджак/мр,но";
   nam = 'room8_winter_formalсoat';
   description = 'Чёрный твидовый пиджак. Очень тёплый.';
   level = 3;
@@ -615,7 +615,7 @@ clothing {
 }
 
 clothing {
-  -"чёрный пиджак,черный пиджак,пиджак/мр";
+  -"чёрный пиджак,черный пиджак,пиджак/мр,но";
   nam = 'room8_formalcoat';
   paired_hot = 'room8_formalvest';
   paired_cold = 'room8_winter_formalсoat';
@@ -739,7 +739,7 @@ clothing {
 }
 
 clothing {
-  -"тёплая рубашка/жр";
+  -"тёплая рубашка/жр,но";
   nam = 'room8_warmshirt';
   part = 'top';
   level = 2;
@@ -762,7 +762,7 @@ clothing {
 }
 
 clothing {
-  -"лёгкая рубашка,рубашка/жр";
+  -"лёгкая рубашка,рубашка/жр,но";
   nam = 'room8_lightwear';
   part = 'top';
   level = 2;
