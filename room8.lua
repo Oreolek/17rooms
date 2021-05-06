@@ -108,7 +108,7 @@ room {
       snapshots:write('entersroom');
     end
     local description = '';
-    if here().hot() then
+    if s.hot() then
       description = [[Жарко. ]];
     end
     local clothes = ''

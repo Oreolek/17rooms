@@ -48,6 +48,11 @@ function init()
  pl.description = "Ты умница и красавица в полном расцвете лет, и выглядишь, как и всегда, отлично. А зовут тебя Настя."	
 end
 
+if pl.test == nil then
+  pl.test = function()
+  end
+end
+
 cutscene {
 	nam = 'intro_cutscene';
 	text = {

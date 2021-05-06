@@ -26,19 +26,10 @@ function expect.attr(value, attribute)
     'expected ' .. value.nam .. ' to not be ' .. attribute
 end
 
-pl.life = function(s)
-  lifeoff(s)
-  rununittest(s);
-  rundebug(s);
-  return false;
+pl.test = function()
+  rununittest(pl);
+  rundebug(pl);
 end;
-
-function init()
-	pl.word = -"ты/жр,2л"
-	pl.room = 'room8_garderob'
-	pl.capacity = 100
-  lifeon(pl)
-end
 
 rundebug = function(s)
   local all_levels = {};
