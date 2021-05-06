@@ -30,6 +30,9 @@ pl.test = function()
   rundebug(pl);
   rununittest(pl);
 end;
+_('room1_kryltco').enter = function()
+  pl.test();
+end;
 
 rundebug = function(s)
   local all_levels = {};

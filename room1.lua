@@ -14,9 +14,6 @@ room {
 	attack_counter = 0;
 	nam = "room1_kryltco";
 	title = "Перед домом";
-  enter = function()
-    pl.test()
-  end;
 	dsc = function(s)
 		if s:once() then
 			p [[
