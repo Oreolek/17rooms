@@ -116,9 +116,12 @@ rununittest = function(s)
       expect.exist(std.game.__started)
     end)
 
-    describe('room8 - одежда', function()
+    describe('room8', function()
+      lester.before(function()
+        walk('room8_garderob')
+      end)
+
       it('превращение', function()
-        walk('room8_garderob');
         expect.equal(here().nam, 'room8_garderob')
         expect.attr(_('room8_clothes'), '~open')
         parse('открыть шкаф');
@@ -198,7 +201,6 @@ rununittest = function(s)
       end);
 
       it('room8 - прохождение', function()
-        walk('room8_garderob');
         room8_switch_temperature('cold');
         take('room8_wintercoat')
         parse('положить шубу на рычаг');
