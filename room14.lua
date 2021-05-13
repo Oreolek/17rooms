@@ -147,6 +147,9 @@ room {
 	end;
 	e_to = '';
 	w_to = '';
+	compass_look = function(s,dir)
+			p 'Не стоит заглядываться по сторонам, лучше сосредоточиться на том что происходит в комнате.';
+	end;
 
 	d_to = 'room10_zal';
 	u_to = 'room17_cherdak';

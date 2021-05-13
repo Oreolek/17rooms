@@ -30,9 +30,10 @@ instead.notitle = false -- enable status
 --instead.get_title = 3
 
 mp.autohelp_limit=1
-mp.compl_thresh=5
+mp.compl_thresh=3
 mp.togglehelp=false
-mp.autocompl=false
+mp.autocompl=true
+mp.lev_thresh=2
 
 room {
 	nam = 'emptyroom';
