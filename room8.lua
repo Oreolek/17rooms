@@ -147,18 +147,20 @@ room {
 }
 
 obj {
-  -"вешалка|вешалки/мн";
+  -"вешалка/жр,но|вешалки/мн,жр,но";
 	nam = "room8_hanger";
   found_in = 'room8_clothes';
   description = 'Здесь нет вешалок, одежда висит на крючках.';
 }: attr 'concealed,static';
 
 obj {
-  -"рукоятка,рукоятка рычага/жр,но|монстр/мн,од";
+  -"рукоятка,рукоятка рычага/жр,но|монстр/мн,од|язык/но,мр";
   nam = 'room8_control_end';
   found_in = 'room8_control';
   description = 'Изогнутый декоративный крюк на конце рычага изображает язык милого монстра. За эту рукоятку удобно хвататься.';
-  before_Receive = 'Рукоятка это часть рычага. Нужно вешать вещи на рычаг.'
+  before_Receive = function(self, thing)
+    mp:xaction('PutOn', thing, _('room8_control'));
+  end;
 }: attr 'concealed,static,~animate';
 
 obj {
@@ -169,7 +171,7 @@ obj {
 }: attr 'concealed,static';
 
 obj {
-	-"рычаг,кондиционер";
+	-"рычаг,кондиционер/мр,но";
 	nam = "room8_control";
   found_in = 'room8_garderob';
 	description = function(self)
@@ -230,12 +232,20 @@ obj {
 }: attr 'static,supporter,scenery';
 
 obj {
-  -"дверь";
+  -"зубчатый ключ,ключ";
+  nam = "thooskey";
+  description = "Зубчатый ключ.";
+}:attr 'disabled';
+
+obj {
+  -"дверь/жр,но";
   nam = 'room8_garagedoor';
   found_in = 'room8_garderob';
   with_key = 'thooskey';
   after_Unlock = function(s)
-    _('thooskey'):disable();
+    if _('thooskey' ~= nil) then
+      _('thooskey'):disable();
+    end
     mp.score=mp.score+1;
     return 'Ключ застревает в замке, но дверь всё-таки открывается.';
   end;
@@ -249,7 +259,7 @@ obj {
 }: attr 'scenery,openable,lockable,locked';
 
 obj {
-  -"замок,электронный замок";
+  -"замок,электронный замок/мр,но";
   nam = 'room8_lock';
   before_Burn = function(self, thing)
     if not (thing ^ 'matches' or thing ^ 'kitchen_lighter' or thing ^ 'kerosin' or thing ^ 'lamp') then
@@ -258,7 +268,8 @@ obj {
     return 'Стальной корпус от этого не разогреется, а костёр скорее сожжёт дом, чем отдельный электронный замок. Плохая идея.';
   end;
   before_Unlock = function(self, thing)
-    return 'Жаль, но электронный замок не открывается '..thing:noun('тв')..'. Хотя в двери ты замечаешь замочную скважину. Попробуй отпереть саму дверь.';
+    pn('Жаль, но электронный замок не открывается '..thing:noun('тв')..', хотя в двери ты замечаешь замочную скважину.');
+    mp:xaction('Unlock', _('room8_garagedoor'), thing);
   end;
   found_in = 'room8_garderob';
   before_Attack = 'Антивандальная защита замка состоит в том, что у него нет отверстий, а стальной корпус нельзя пробить.';
@@ -406,7 +417,7 @@ clothing = Class {
 -- Да, ты можешь писать "открыть крючок" потому что это синоним шкафа.
 -- Но то, что крючки не смоделированы, должно намекать на их несущественность.
 obj {
-  -"шкаф,гардероб/мр,но|крючки/мн,но|крючок/мр,но|одежда/жр,но";
+  -"шкаф,гардероб/мр,но|крючки/мр,мн,но|крючок/мр,но|одежда/жр,но";
   nam = 'room8_clothes';
   before_Receive = function(self, thing)
     if not thing:has('clothing') then
@@ -492,7 +503,7 @@ clothing {
 }: attr 'worn,concealed';
 
 clothing {
-  -"трусы,трусики,труселя/ср,мч|белье,бельё/ср";
+  -"трусы,трусики,труселя/ср,мч,мн|белье,бельё/ср";
   nam = 'room8_underwear_bottom';
   part = 'bottom';
   description = 'Твоё нижнее бельё.';
@@ -503,7 +514,7 @@ clothing {
 }: attr 'worn,concealed';
 
 clothing {
-  -"туфли/жр,мч|туфля/жр";
+  -"туфли/жр,мч,мн|туфля/жр";
   nam = 'room8_shoes';
   part = 'feet';
   description = 'Чёрные блестящие туфли на каблуке.';
@@ -720,7 +731,7 @@ clothing {
 }
 
 clothing {
-  -"накидка/мр";
+  -"накидка/жр";
   nam = 'room8_overcoat';
   part = 'top';
   paired_cold = 'room8_wintercoat';
@@ -874,8 +885,12 @@ obj {
 obj {
   -"карман/мр,но|карманы/мн,мр,но";
   nam = 'room8_out_pockets';
+  before_Drop = 'Нет, ты же можешь таскать с собой столько вещей!';
+  before_Receive = function(self, thing)
+    mp:xaction('Take', thing)
+  end;
   description = 'Карманы пусты, в них нет ничего интересного.';
-}: attr 'static,concealed';
+}: attr 'concealed,container';
 take('room8_out_pockets');
 
 obj {

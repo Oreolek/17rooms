@@ -1,10 +1,12 @@
--- Доступное пространство имён для объектов - все имена объектов должны начинаться с "room17_" или "cherdak_" 
+-- Доступное пространство имён для объектов - все имена объектов должны начинаться с "room17_" или "cherdak_"
 -- Все описания можно менять
 -- Задача: Это изначально тёмная комната. Игрок может придти как с источником света, так и без него. Задача - найти предмет circlekey
 room {
 	nam = "room17_cherdak";
 	title = "Чердак";
 	lock_down = false;
+	cornice_seen = false;
+	door_seen = false;
 	dsc = "Почти нет пыли. Уютно, хоть и пустовато.";
 	dark_dsc = "Здесь темно, единственный выход вниз.";
 	d_to = function(s)
@@ -80,6 +82,15 @@ obj {
 		enable("room17_wall");
 		--disable '@d_to'
 		here().lock_down = true;
+
+		if here().cornice_seen then
+			enable("room17_cornice");
+		end;
+
+		if here().door_seen then
+			enable("room17_door");
+		end;
+
 		mp:clear();
 		return false;
 	end;
@@ -92,13 +103,15 @@ obj {
 		return false;
 	end;
 	after_Disrobe = function(s)
-		if not (have("room17_canvas") or have("room17_box") or have("room17_letter")) then
 			--enable '@d_to'
-			here().lock_down = false;
-		end
+		here().lock_down = false;
 		pn [[Ты снимаешь маску.]];
 		p [[^Обстановка комнаты изменилась.]];
 		mp:clear();
+
+		here().cornice_seen = not _'room17_cornice':disabled();
+		here().door_seen = not _'room17_door':disabled();
+
 		disable("room17_wall");
 		disable("room17_cornice");
 		disable("room17_door");
@@ -150,7 +163,7 @@ obj {
 		end;
 	end;
 	after_Exam = function(s)
-		p [[На холсте нарисован очаг. В очаге горит огонь. На огне стоит  котелок.^В котелке кипит баранья похлёбка с чесноком. Над котелком вьётся дым.]];
+		p [[На холсте нарисован очаг. В очаге горит огонь. На огне стоит котелок.^В котелке кипит баранья похлёбка с чесноком. Над котелком вьётся дым.]];
 	end;
 	after_PutOn = function(s, w)
 		if not w ^ 'room17_cornice' then
@@ -207,7 +220,7 @@ obj {
 		if _"room17_mask":has'worn' then
 			p [[«Эта дурацая дверца раздражает. Три часа на неё пялюсь, не могу отсюда выбраться. Завешу её чем-нибудь.»^
 				Похоже на почерк тёти Агаты.
-				«Это невыносимо. Дурацкая дверца просто исчезла. Теперь ни  дверцы, ни другого выхода. Сижу и таращусь на пустую стену.
+				«Это невыносимо. Дурацкая дверца просто исчезла. Теперь ни дверцы, ни другого выхода. Сижу и таращусь на пустую стену.
 				Лучше повесить холст обратно на карниз.»^
 				Вторая строка писалась гораздо позже первой.^Буквы  крупнее и почерк неровный, но это всё ещё её почерк.]];
 		else
@@ -224,7 +237,7 @@ obj {
 }
 
 obj {
-	-"стены, стенки/мн";
+	-"стены,стенки/мн";
 	nam = "room17_walls";
 	description = function(s)
 		if _"room17_mask":has'worn' then
@@ -236,7 +249,7 @@ obj {
 }:attr 'static'
 
 obj {
-	-"стена , стенка/ед";
+	-"стена,стенка/ед";
 	nam = "room17_wall";
 	before_Exam  = function(s)
 		enable("room17_cornice");

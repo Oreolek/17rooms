@@ -6,7 +6,13 @@ room {
 	nam = "room15_bedroom";
 	book_read = false;
 	title = "Спальня";
-	dsc = "Просторная комната с единственным окном. Выход из комнаты находится на западе. ";
+	dsc = function(s)
+		if pl:where()^'room15_void' then
+			return "Тебя окружает пустота. Через окно ты видишь просторную спальню. ";
+		else
+			return "Просторная комната с единственным окном. Выход из комнаты находится на западе. ";
+		end;
+	end;
 	w_to = 'room14_secondfloor';
 	awake = false;
 	complete = false;
@@ -88,7 +94,12 @@ room {
 			return "Проходит немного времени. Кажется, рисунок на обоях слегка изменился. ";
 		end;
 	end;
-	after_Dig = "Тебе слишком дорог твой маникюр, чтобы делать это руками. ";
+	after_Dig = function(s, w)
+		if w == nil then
+			return "Тебе слишком дорог твой маникюр, чтобы делать это руками. ";
+		end;
+		return false;
+	end;
 	after_Jump = "Пол жалобно поскрипывает после твоего приземления. ";
 	after_Think = function(s)
 		if s.awake and not s.complete then
@@ -98,9 +109,10 @@ room {
 		end;
 	end;
 	before_Sing = function(s)
-		if not s.awake and _'room15_tv':attr('on') then
+		if not s.awake and _'room15_tv':has('on') then
 			pr 'Твой голос сливается с голосами из телевизора и оттого ужасающее пение становится еще более жутким. ';
 		end;
+		return false;
 	end;
 	after_Sleep = function(s)
 		if pl:where()^'room15_bed' then
@@ -239,7 +251,7 @@ obj {
 		if _'room15_bedroom'.awake then
 			pr 'Тетушке не понравится, если ты съешь занавески. ';
 		else
-			pr 'Жуется, конечно приятно, но съесть целую занавеску? Ну уж нет. ';
+			pr 'Жуется, конечно, приятно, но съесть целую занавеску? Ну уж нет. ';
 		end;
 	end;
 	before_Touch = 'Плотная ткань немного жесткая, но довольно приятная на ощупь. ';
@@ -259,8 +271,10 @@ obj {
 			if _'room15_bedroom'.awake then
 				pr 'За окном ты видишь голубое небо. ';
 			else
-				pr 'За окном ты видишь непроглядную пустоту. ';
-				mp:content(_'room15_void');
+				if not pl:where()^'room15_void' then
+					pr 'За окном ты видишь непроглядную пустоту. ';
+					mp:content(_'room15_void');
+				end;
 			end;
 		else
 			pr 'Окно закрыто плотными занавесками. ';
@@ -320,7 +334,12 @@ obj {
 			pr 'Сначала стоит открыть занавески. ';
 			return;
 		end;
-		mp:xaction('Enter', _'room15_void');
+
+		if pl:where()^'room15_void' then
+			mp:xaction('Exit', _'room15_void');
+		else
+			mp:xaction('Enter', _'room15_void');
+		end;
 	end;
 	before_Receive = function(s)
 		if _'room15_curtain':has('~open') then
@@ -337,7 +356,7 @@ obj {
 	title = 'В кровати';
 	dsc = 'У стены стоит большая кровать. ';
 	description = function(s)
-		pr 'Большая кровать, застеленная чистым бельем. ';
+		pr 'Большая кровать, застеленная покрывалом. ';
 		mp:content(s);
 	end;
 	inside_dsc = 'Ты лежишь на большой кровати. ';
@@ -363,9 +382,9 @@ obj {
 		end;
 		return false;
 	end;
-	before_Smell = 'Пахнет чистым, свежевыглаженным постельным бельем. ';
+	before_Smell = 'Пахнет тканью, деревом и пылью. ';
 	before_Taste = 'Ты аккуратно кусаешь угол кровати. На вкус как дерево. ';
-	before_Eat = 'Долго рассматривая кровать, ты так и не решила, с чего начать ее есть . ';
+	before_Eat = 'Долго рассматривая кровать, ты так и не решила, с чего начать ее есть. ';
 	["before_Touch,Rub"] = function(s)
 		if _'room15_bedroom'.awake and not _'room15_bedroom'.complete then
 			pr 'Постель мягкая и приятная на ощупь. Так и тянет {$fmt em|спать}. ';
@@ -379,45 +398,25 @@ obj {
 	before_Blow = 'Ты подула на кровать, но ничего не изменилось. ';
 	before_Take = 'Кровать слишком тяжелая. ';
 	obj = {
-		'room15_sheets'
+		'room15_bedspread'
 	};
 }: attr('enterable,supporter,static,luminous');
 
 obj {
-	-"белье|простыня";
-	nam = 'room15_sheets';
-	description = 'Чистая простыня лежит на кровати. ';
-	before_Take = function(s)
-		if _'room15_bedroom'.awake then
-			return 'Что ты задумала?';
-		else
-			return 'Простыня странным образом не стягивается с кровати, выскальзывая из твоих рук. ';
-		end;
-	end;
-	before_Smell = 'Пахнет чистой постелью. ';
-	before_Tear = function(s)
-		if s.awake then
-			pr 'Тётя Агата будет очень недовольна, если ты это сделаешь. ';
-		else
-			pr 'У тебя не получается оторвать простыню от кровати. Странно. ';
-		end;
-	end;
-	before_Tie = function(s, w)
-		if s.awake then
-			pr 'Ты не понимаешь, для чего тебе это. ';
-		elseif w == nil then
-			pr 'У тебя не получается оторвать простыню от кровати. Странно. ';
-		else
-			pr 'Ты не понимаешь, как это сделать. ';
-		end;
-	end;
-	["before_Taste,Eat"] = 'Ты отгрызаешь уголок простыни, надеясь, что тётушка не заметит этого. Ткань приятно жуется и почти безвкусная. ';
-	["before_Rub,Touch"] = 'Простыня шершавая, но очень приятные на ощупь. ';
-	before_Cut = 'Твои руки недостаточно острые. ';
-	before_Attack = 'Ты со всей силы бьешь простыню. Она мягкая, все стерпит. ';
+	-"покрывало";
+	nam = 'room15_bedspread';
+	description = 'Мягкое бархатное покрывало лежит на кровати. ';
+	before_Take = 'Что ты задумала?';
+	before_Smell = 'Пахнет тканью и пылью. ';
+	before_Tear = 'Тётя Агата будет очень недовольна, если ты это сделаешь. ';
+	before_Tie = 'Ты не понимаешь, для чего тебе это. ';
+	["before_Taste,Eat"] = 'Ты пытаешься отгрызть уголок покрывала, но у тебя ничего не получается. Тебе остается лишь надеяться, что тетушка не заметит погрызенное покрывало. ';
+	["before_Rub,Touch"] = 'Покрывало гладкое и мягкое. ';
+	before_Cut = 'Ты не думаешь, что это хорошая идея. ';
+	before_Attack = 'Ты со всей силы бьешь покрывало. Оно мягкое, все стерпит. ';
 	before_Blow = 'Ты дуешь на ткань. ';
-	["before_Talk,Tell,Answer,Ask,AskFor,AskTo"] = "Простыне очень интересно, правда. Продолжай. ";
-	before_Kiss = "Простыня никак не реагируют. ";
+	["before_Talk,Tell,Answer,Ask,AskFor,AskTo"] = "Покрывалу очень интересно, правда. Продолжай. ";
+	before_Kiss = "Покрывалу, должно быть, очень приятно. Но оно никак не реагирует. ";
 }:attr('concealed');
 
 obj {
@@ -473,6 +472,14 @@ obj {
 			return 'Ты опасаешься разозлить паука и решаешь этого не делать. ';
 		end;
 	end;
+	life_Show = function(s, w)
+		print('FUG');
+		if _'room15_bedroom'.awake then
+			return 'Паучок старательно делает вид, что ему интересно. ';
+		else
+			return 'Паук недовольно шипит на ' .. w:noun('вн') .. '.';
+		end;
+	end;
 	before_Kiss = 'Чего?!';
 	before_Listen = function(s)
 		if _'room15_bedroom'.awake then
@@ -481,7 +488,7 @@ obj {
 			return 'Паук шипит, щелкает пастью и скрежещет своими лапами по полу. ';
 		end;
 	end;
-}: attr('static'): disable();
+}: attr('static,animate'): disable();
 
 obj {
 	-"стол,столик|столешница";
@@ -551,7 +558,14 @@ obj {
 	before_Take = 'Лампе и здесь хорошо. ';
 	before_Smell = 'Лампа ничем не пахнет. Странно. ';
 	["before_Taste,Eat"] = 'Ты долго раздумываешь над вкусовыми качествами пластиковых абажуров и стеклянных ламп, и в итоге решаешь не пробовать ни то ни другое. ';
-	["before_Push,Pull,Turn,Rub,Touch,Attack,Tear,Tie,Cut"] = 'Да сколько можно все вокруг ломать? ';
+	before_Touch = function(s)
+		if s:has('light') then
+			pr 'Лампа слишком горячая!';
+		else
+			pr 'Светильник теплый на ощупь. '
+		end;
+	end;
+	["before_Push,Pull,Turn,Rub,Attack,Tear,Tie,Cut"] = 'Да сколько можно все вокруг ломать? ';
 	before_Blow = 'Ты дуешь на светильник. ';
 	["before_Talk,Tell,Answer,Ask,AskFor,AskTo"] = "Ваза остается безучастной к твоим мольбам. ";
 	before_Kiss = "Может, лучше не надо?";
@@ -636,52 +650,69 @@ obj {
 }: attr('container,transparent,open,static');
 
 obj {
-	-"простыни";
+	-"простыня,простынь";
 	nam = 'room15_linen';
-	description = 'Несколько комплектов чистых простыней. Они кажутся достаточно прочными, чтобы выдержать твой вес. ';
+	description = 'Чистая простыня. Она кажется достаточно прочной, чтобы выдержать твой вес. ';
 	before_Take = function(s)
 		if _'room15_book':disabled() then
 			_'room15_book':enable();
-			pr 'Под простынями лежит книга!';
+			pr 'Под простынёй лежит книга!';
 		end;
 
 		return false;
+	end;
+	tearApart = function(s)
+		remove('room15_linen', where('room15_linen'));
+		mp.score=mp.score+1
+		take('room15_shreds');
+		pr 'Ты разрываешь простыню, теперь у тебя есть обрывки ткани. ';
+		if _'room15_book':disabled() then
+			_'room15_book':enable();
+			pr 'Под простынёй лежит книга!';
+		end;
 	end;
 	before_Smell = 'Пахнет чистой постелью. ';
 	before_Tear = function(s)
 		if s.awake then
 			pr 'Тётя Агата будет очень недовольна, если ты это сделаешь. ';
 		else
-			remove('room15_linen', where('room15_linen'));
-			mp.score=mp.score+1
-			take('room15_shreds');
-			pr 'Ты разрываешь простыни, теперь у тебя есть обрывки ткани. ';
-			if _'room15_book':disabled() then
-				_'room15_book':enable();
-				pr 'Под простынями лежит книга!';
-			end;
+			s:tearApart();
 		end;
 	end;
 	before_Tie = function(s, w)
 		if s.awake then
 			pr 'Ты не понимаешь, для чего тебе это. ';
 		elseif w == nil or w^'room15_window' then
-			pr 'Так ничего не получится. Они слишком большие. ';
+			pr 'Так ничего не получится. Она слишком короткая и чересчур толстая. ';
+		elseif w^'statuetka' then
+			pr 'Статуэтка слишком далеко. '
 		else
 			pr 'Ты не понимаешь, для чего тебе это. ';
 		end;
 	end;
-	["before_Taste,Eat"] = 'Ты отгрызаешь уголок одной из простыней, надеясь, что тётушка не заметит этого. Ткань приятно жуется и почти безвкусная. ';
-	["before_Rub,Touch"] = 'Простыни шершавые, но очень приятные на ощупь. ';
-	before_Cut = 'Твои руки недостаточно острые. ';
-	before_Attack = 'Ты со всей силы бьешь простыни. Они мягкие, все стерпят. ';
+	["before_Taste,Eat"] = 'Ты отгрызаешь уголок простыни, надеясь, что тётушка не заметит этого. Ткань приятно жуется и почти безвкусная. ';
+	["before_Rub,Touch"] = 'Простыня шершавая, но очень приятная на ощупь. ';
+	before_Cut = function(s, w)
+		if s.awake then
+			pr 'Тётя Агата будет очень недовольна, если ты это сделаешь. ';
+		else
+			if w == nil then
+				return 'Твои руки недостаточно острые. ';
+			elseif w^'dagger' then
+				s:tearApart();
+			else
+				return 'Простыня не режется. Возможно стоит резать ее чем-то другим. ';
+			end;
+		end;
+	end;
+	before_Attack = 'Ты со всей силы бьешь простыню. Она мягкая, все стерпит. ';
 	before_Blow = 'Ты дуешь на ткань. ';
-	["before_Talk,Tell,Answer,Ask,AskFor,AskTo"] = "Простыням очень интересно, правда. Продолжай. ";
-	before_Kiss = "Простыни никак не реагируют. ";
+	["before_Talk,Tell,Answer,Ask,AskFor,AskTo"] = "Простыне очень интересно, правда. Продолжай. ";
+	before_Kiss = "Простыня никак не реагируют. ";
 };
 
 obj {
-	-"простыни|обрывки простыней,обрывки простыни,обрывки ткани,обрывки|ткань";
+	-"обрывки простыни,обрывки ткани,обрывки|простыня|ткань";
 	nam = 'room15_shreds';
 	description = 'Прочные и длинные полосы из простыней. ';
 	before_Tie = function(s, w)
@@ -708,7 +739,7 @@ obj {
 }
 
 obj {
-	-"веревка|простыни|обрывки простыней,обрывки простыни,обрывки ткани,обрывки|ткань";
+	-"веревка|простыня|обрывки простыни,обрывки ткани,обрывки|ткань";
 	nam = 'room15_rope';
 	description = 'Веревка связанная из обрывков простыней. Достаточно прочная, чтобы выдержать тебя. ';
 	before_Tie = function(s, o)
@@ -795,7 +826,7 @@ obj {
 			pr(s:vision());
 		end;
 	end;
-	after_Take = 'Он слишком тяжелый. ';
+	["before_Take,Pull,Push"] = 'Он слишком тяжелый. ';
 	after_SwitchOn = function(s)
 		s:attr('luminous');
 		if s.awake then
@@ -823,7 +854,12 @@ obj {
 		if _'room15_bedroom'.awake then
 			return 'На экране идет какой-то фильм про гангстеров. ';
 		elseif _'room15_curtain':has('open') then
-			return 'На экране с трудом различимо окно, через которое видна какая-то комната. Да там же ты! ';
+			if pl:where()^'room15_void' then
+
+				return 'На экране с трудом различимо окно, через которое видна какая-то комната очень похожая на спальню тетушки. ';
+			else
+				return 'На экране с трудом различимо окно, через которое видна какая-то комната. Да там же ты! ';
+			end;
 		else
 			return 'На экране с трудом различимо какое-то окно, закрытое шторами. ';
 		end;
@@ -887,17 +923,19 @@ obj {
 			pr('Сначала придется открыть окно. ');
 		end;
 	end;
+	after_LetGo = function(s, o)
+		if o^'statuetka' and have('statuetka') then
+			_'room15_bedroom'.complete = true;
+			pr('Едва схватив ' .. _'statuetka':noun'вн' .. ', ты ощущаешь, что начинаешь падать. Веревка выскальзывает из твоей руки и ты просыпаешься от сильного удара. Ты лежишь на кровати, крепко сжимая в руке '.. _'statuetka':noun'вн' .. '. ');
+			mp:subaction('Wake');
+			return
+		end;
+		return false;
+	end;
 	before_Exam = function(s)
 		pr 'Там пусто. ';
 
 		mp:content(s);
-	end;
-	after_Exit = function(s)
-		if have('statuetka') then
-			_'room15_bedroom'.complete = true;
-			pr('Держа ' .. _'statuetka':noun'вн' .. ' в одной руке, второй ты пытаешься вернуться в комнату, держась за веревку. Несколько секунд кажутся несколькими часами, но вот ты касаешься подоконника и падаешь на пол. Падение приводит тебя в чувства и ты просыпаешься. В руке ты крепко сжимаешь '.. _'statuetka':noun'вн' .. '. ');
-			mp:subaction('Wake');
-		end;
 	end;
 	obj = {
 		'statuetka';
